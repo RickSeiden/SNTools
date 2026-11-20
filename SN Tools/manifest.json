@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "SNTools",
+  "version": "1.0",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.service-now.com/*",
+	"*://*.servicenowservices.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["sn-sdk.js"],
+      "matches": [
+		"*://*.service-now.com/*",
+		"*://*.servicenowservices.com/*"
+	  ]
+    }
+  ]
+}
