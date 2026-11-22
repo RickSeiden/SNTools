@@ -7,7 +7,11 @@
   <!-- Local CodeMirror Assets -->
   <link rel="stylesheet" href="lib/codemirror.min.css">
   <link rel="stylesheet" href="lib/dracula.min.css">
+  <link rel="stylesheet" href="lib/lint.css">
+  <link rel="stylesheet" href="lib/foldgutter.css">
+  <link rel="stylesheet" href="lib/dialog.css">
 
+  
   <style>
     * { box-sizing: border-box; }
     body {
@@ -97,6 +101,16 @@
       flex-direction: column;
       max-width: 1050px;
     }
+	
+	.editor-pane-row {
+      gap: 16px;
+      padding: 16px 0px;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: row;
+      max-width: 1050px;
+	}
+	
     .top-bar {
       display: flex;
       gap: 12px;
@@ -180,6 +194,9 @@
     }
     .status.show { opacity: 1; }
   </style>
+  
+
+	
 </head>
 <body>
 
@@ -204,16 +221,30 @@
     <div class="top-bar">
       <input type="text" id="pluginName" placeholder="Plugin Name (e.g., ServiceNow Quick Copy)">
     </div>
-    <div class="id-badge">ID: <span id="pluginIdDisplay">-</span></div>
+	
+	<div class="id-badge">ID: <span id="pluginIdDisplay">-</span></div>
+	<div class="editor-pane-row">
+		<label class="checkbox-label">
+		  <input type="checkbox" id="activeFlag"> Active
+		</label>
 
-    <label class="checkbox-label">
-      <input type="checkbox" id="activeFlag"> Active
-    </label>
-
+		<label class="checkbox-label">
+		  <input type="checkbox" id="libraryFlag"> Library
+		</label>
+	</div>
+	
     <div class="field-group">
       <label for="matchPattern">Match Pattern</label>
       <input type="text" id="matchPattern" placeholder="e.g., service-now.com">
+		<div class="id-badge">
+			<span id="match_help">
+			Split by comma for OR groups, and '+' for AND conditions within a group<br/>
+			Example: "service-now.com + incident.do, service-now.com + problem.do"
+			</span>
+		</div>
     </div>
+	
+
 
     <div class="field-group" id="jsWrapper">
       <label>JavaScript Code</label>
@@ -227,6 +258,7 @@
 
     <div class="actions">
       <button id="saveBtn" class="btn-primary">Save</button>
+	  <button id="exportSingleBtn" class="btn-secondary">Export</button>
       <span id="statusMsg" class="status">Saved!</span>
       <button id="deleteBtn" class="btn-danger">Delete</button>
     </div>
@@ -236,8 +268,23 @@
   <script src="lib/codemirror.min.js"></script>
   <script src="lib/javascript.min.js"></script>
   <script src="lib/css.min.js"></script>
-  <script src="options.js"></script>
   <script src="lib/matchbrackets.js"></script>
   <script src="lib/closebrackets.js"></script>
+  
+  <!-- Linting Dependencies (order matters) -->
+  <script src="lib/jshint.js"></script>
+  <script src="lib/lint.js"></script>
+  <script src="lib/javascript-lint.js"></script>
+  
+  <script src="lib/foldcode.js"></script>
+  <script src="lib/foldgutter.js"></script>
+  <script src="lib/brace-fold.js"></script>
+  <script src="lib/comment-fold.js"></script>
+  
+  <script src="lib/search.js"</script>
+  <script src="lib/searchcursor.js"</script>
+  <script src="lib/dialog.js"></script>
+  
+  <script src="options.js"></script>
 </body>
 </html>

@@ -26,5 +26,9 @@
 		"*://*.servicenowservices.com/*"
 	  ]
     }
-  ]
+  ],
+  "icons": {
+	  "128": "SNTools-128.png",
+	  "48": "SNTools-48.png"
+  }
 }

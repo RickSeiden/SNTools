@@ -1,3 +1,58 @@
+// function matchesUrl(url, rawPattern) {
+  // if (!rawPattern || !rawPattern.trim()) return false;
+
+  // // 1. Check if the entire pattern is wrapped in /regex/flags (e.g. /incident|problem/i)
+  // const regexLiteral = rawPattern.trim().match(/^\/(.+)\/([gimsuy]*)$/);
+  // if (regexLiteral) {
+    // try {
+      // return new RegExp(regexLiteral[1], regexLiteral[2]).test(url);
+    // } catch (err) {
+      // console.warn('[Plugin Container] Invalid regex pattern:', rawPattern, err);
+      // return false;
+    // }
+  // }
+
+
+  // // 2. Otherwise, split by commas to allow multiple patterns (supports * wildcards)
+  // const patterns = rawPattern
+    // .split(',')
+    // .map((p) => p.trim())
+    // .filter(Boolean);
+
+  // return patterns.some((pattern) => {
+    // const itemRegex = pattern.match(/^\/(.+)\/([gimsuy]*)$/);
+    // if (itemRegex) {
+      // try {
+        // return new RegExp(itemRegex[1], itemRegex[2]).test(url);
+      // } catch {
+        // return false;
+      // }
+    // }
+
+    // if (pattern.includes('*')) {
+      // const escaped = pattern
+        // .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+        // .replace(/\*/g, '.*');
+      // return new RegExp(escaped, 'i').test(url);
+    // }
+
+    // return url.toLowerCase().includes(pattern.toLowerCase());
+  // });
+// }
+
+function matchesUrl(url, matchString) {
+  if (!matchString || !matchString.trim()) return true;
+
+  // Split by comma for OR groups, and '+' for AND conditions within a group
+  // Example: "service-now.com + incident.do, service-now.com + problem.do"
+  const orGroups = matchString.split(',').map(s => s.trim()).filter(Boolean);
+
+  return orGroups.some(group => {
+    const andTerms = group.split('+').map(s => s.trim()).filter(Boolean);
+    return andTerms.every(term => url.includes(term));
+  });
+}
+
 chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
     if (changeInfo.status !== 'complete' || !tab.url)
         return;
@@ -14,8 +69,9 @@ chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
         return;
 
     // Filter plugins that match this tab's URL
-    const matchingPlugins = plugins.filter(
-            (p) => p.active && p.matchPattern && tab.url.includes(p.matchPattern));
+    const matchingPlugins = plugins
+        .filter((p) => p.active && matchesUrl(tab.url, p.matchPattern))
+        .sort((a, b) => Number(Boolean(b.library)) - Number(Boolean(a.library)));
 
     if (matchingPlugins.length === 0)
         return;
@@ -55,7 +111,7 @@ chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
                         const fn = new Function('PLUGIN_CSS', 'PLUGIN_ID', codeString);
                         fn(cssString || '', pluginId);
                     } catch (err) {
-                        console.error(`[Plugin Error: ${pluginName}]`, err);
+                        console.error(`[SNTools] Plugin Error: ${pluginName}`, err);
                     }
                 },
                 args: [plugin.code, plugin.css, plugin.id, plugin.name]
