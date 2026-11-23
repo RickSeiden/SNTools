@@ -1,0 +1,38 @@
+[
+  {
+    "id": "example-button",
+    "name": "Example Button",
+    "active": false,
+    "library": false,
+    "matchPattern": "service-now.com",
+    "code": "SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n  \n  var button = SNTools.addInsideAfter('h1.form_header.navbar-title',\n  \t{\n id: 'my-copy-btn',\n type: 'button',\n className: 'btn btn-default',\n textContent: 'Copy SysID!',\n flexParent: true,\n onclick(e) {\n   const btn = e.currentTarget;\n   navigator.clipboard.writeText(record.sysId);\n   btn.textContent = 'Copied!';\n   setTimeout(() => {\n      btn.textContent = 'Copy SysID';\n   }, 1500);\n  }\n}\n);\n  \n});",
+    "css": ""
+  },
+  {
+    "id": "hide-discuss-button",
+    "name": "Hide Discuss Button",
+    "active": false,
+    "library": false,
+    "matchPattern": "service-now.com",
+    "code": "SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n  \nSNTools.hideElement(\"#create_collab_chat\");\nSNTools.hideElement(\"#notificationFollowWidget\");\n});",
+    "css": ""
+  },
+  {
+    "id": "sntoolsutils",
+    "name": "SNToolsUtils",
+    "active": true,
+    "library": true,
+    "matchPattern": "service-now.com",
+    "code": "window.SNToolsUtils = class SNToolsUtils {\n  isJSONObject(str) {\n    if (typeof str !== 'string') return false;\n\n    try {\n      const parsed = JSON.parse(str);\n      return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);\n    } catch (e) {\n      return false;\n    }\n  }\n}",
+    "css": ""
+  },
+  {
+    "id": "check-for-json",
+    "name": "Check For JSON",
+    "active": true,
+    "library": false,
+    "matchPattern": "service-now.com",
+    "code": "SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n  \n  const el = await SNTools.waitForLoaded();\n\n  var g_form = SNTools.g_form();\n  var fields=g_form.elements;\n  fields.forEach(function(field){\n    if (field.type==\"string\"){\n\t  \tif (new SNToolsUtils().isJSONObject(g_form.getValue(field.fieldName))){\n          g_form.showFieldMsg(field.fieldName,\"IS JSON\");\n      }\n    } else if (field.type==\"json\"){\n      g_form.showFieldMsg(field.fieldName,\"IS JSON\");\n    }\n  });\n});",
+    "css": ""
+  }
+]
