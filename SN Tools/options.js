@@ -18,6 +18,7 @@ const saveBtn = document.getElementById('saveBtn');
 const exportSingleBtn = document.getElementById('exportSingleBtn');
 const deleteBtn = document.getElementById('deleteBtn');
 const statusMsg = document.getElementById('statusMsg');
+const statusMsgSidebar = document.getElementById('statusMsgSidebar');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const importFileInput = document.getElementById('importFileInput');
@@ -417,6 +418,10 @@ function showStatus(text) {
     statusMsg.textContent = text;
     statusMsg.classList.add('show');
     setTimeout(() => statusMsg.classList.remove('show'), 1500);
+
+    statusMsgSidebar.textContext = text;
+    statusMsgSidebar.classList.add('show');
+    setTimeout(() => statusMsgSidebar.classList.remove('show'),1500);
 }
 
 function escapeHtml(str) {
