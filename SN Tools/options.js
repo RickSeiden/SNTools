@@ -288,7 +288,9 @@ importFileInput.addEventListener('change', async (e) => {
 });
 
 // --- Unsaved State & Draft Cleanup Logic ---
-
+/*
+This is the function that handles the "do you want to save" function
+*/
 async function handleUnsavedChangesBeforeSwitch() {
     if (!currentPluginId)
         return true;

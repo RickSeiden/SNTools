@@ -1,0 +1,47 @@
+[
+  {
+    "active": false,
+    "code": "SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n  \n  var button = SNTools.addInsideAfter('h1.form_header.navbar-title',\n  \t{\n id:'my-copy-btn',\n type:'button',\n className:'btn btn-default',\n textContent: 'Copy SysID!',\n flexParent: true,\n onclick(e) {\n   const btn = e.currentTarget;\n   navigator.clipboard.writeText(record.sysId);\n   btn.textContent = 'Copied!';\n   setTimeout(() => {\n      btn.textContent = 'Copy SysID';\n   }, 1500);\n  }\n}\n);\n  \n});",
+    "css": "",
+    "id": "example-button",
+    "library": false,
+    "matchPattern": "service-now.com",
+    "name": "Example Button"
+  },
+  {
+    "active": false,
+    "code": "SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n  \nSNTools.hideElement(\"#create_collab_chat\");\nSNTools.hideElement(\"#notificationFollowWidget\");\n});",
+    "css": "",
+    "id": "hide-discuss-button",
+    "library": false,
+    "matchPattern": "service-now.com",
+    "name": "Hide Discuss Button"
+  },
+  {
+    "active": true,
+    "code": "window.SNToolsUtils = class SNToolsUtils {\n  isJSONObject(str) {\n    if (typeof str !== 'string') return false;\n\n    try {\n      const parsed = JSON.parse(str);\n      return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);\n    } catch (e) {\n      return false;\n    }\n  }\n  \n  makeJSONFlagStyle(){\n    return 'font-size: 0.75em; '+\n    \t'font-family: \"san-serif\"; '+\n      'background-color:orange; '+\n      'color: black; '+\n        'margin-left: 5px; '+\n        'padding: 2px;';\n  }\n}",
+    "css": "",
+    "id": "sntoolsutils",
+    "library": true,
+    "matchPattern": "service-now.com",
+    "name": "SNToolsUtils"
+  },
+  {
+    "active": true,
+    "code": "  function addJSONFlag(field, field_json) {\n      SNTools.console(\"field=\" + JSON.stringify(field, null, 2) + \"\\nfield_json=\" + field_json);\n      const labelId = `label.${field.tableName}.${field.fieldName}`;\n      const selector = `#${CSS.escape(labelId)}`;\n      const formatted_json = JSON.stringify(JSON.parse(field_json), null, 2);\n      const window_content = `<pre>${formatted_json}</pre>`;\n      //const window_content=\"<pre>\"+JSON.strinfgify(g_form.getValue(field.fieldName),null,2)+\"</pre>\";\n      SNTools.addInsideBefore(selector, {\n          \"id\": \"json-for-\" + field.fieldName,\n          \"tag\": \"span\",\n          \"textContent\": \"JSON\",\n          \"attrs\": {\n              \"style\": new SNToolsUtils().makeJSONFlagStyle()\n          },\n          onclick(e) {\n              const btn = e.currentTarget;\n              const myWindow = window.open(\"\", \"\", \"width=300,height=300\");\n              myWindow.document.write(`${window_content}`);\n          }\n      });\n  }\n\n  SNTools.onRouteChange(async () => {\n      try {\n          const record = SNTools.getRecord();\n          if (!record || record.isWorkspace) return;\n          const form = await SNTools.waitForLoaded();\n\n          const tools = new SNToolsUtils();\n          var g_form = SNTools.g_form();\n          var fields = g_form.elements;\n          fields.forEach(function(field) {\n              if (field.type == \"string\") {\n                  if (tools.isJSONObject(g_form.getValue(field.fieldName))) {\n                      //g_form.showFieldMsg(field.fieldName,\"IS JSON\");\n                      addJSONFlag(field, g_form.getValue(field.fieldName));\n\n                  }\n              } else if (field.type == \"json\") {\n                  const json_value = g_form.getValue(field.fieldName);\n                  if (json_value != '' && (typeof json_value) == 'string') {\n                      addJSONFlag(field, g_form.getValue(field.fieldName));\n                  }\n              }\n          });\n      } catch (e) {\n          SNTools.console(e.message, \"error\");\n      }\n  });",
+    "css": "",
+    "id": "check-for-json",
+    "library": false,
+    "matchPattern": "service-now.com",
+    "name": "Check For JSON"
+  },
+  {
+    "active": false,
+    "code": "try{\n  SNTools.onRouteChange(async () => {\n    const record = SNTools.getRecord();\n    if (!record || record.isWorkspace) return;\n\n    let data = await SNTools.REST(\"/api/now/table/incident?sysparm_limit=1\");\n   \tSNTools.console(JSON.stringify(data.result,null,2));//JSON.stringify(result, null, 2));\n});\n} catch (e){\n  SNTools.console(e.message, 'error');\n}",
+    "css": "",
+    "id": "rest",
+    "library": false,
+    "matchPattern": "service-now.com",
+    "name": "REST"
+  }
+]
