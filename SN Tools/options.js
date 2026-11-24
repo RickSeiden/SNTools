@@ -24,7 +24,7 @@ const importBtn = document.getElementById('importBtn');
 const importFileInput = document.getElementById('importFileInput');
 
 // Initialize
-document.addEventListener('DOMContentLoaded', async() => {
+document.addEventListener('DOMContentLoaded', async () => {
     initCodeEditors();
 
     const data = await chrome.storage.local.get('plugins');
@@ -48,18 +48,21 @@ function initCodeEditors() {
         lineWrapping: true,
         extraKeys: {
             'Ctrl-S': () => saveBtn.click(),
-            'Cmd-S': () => saveBtn.click()
+            'Cmd-S': () => saveBtn.click(),
+            'Shift-Ctrl-F': (cm) => formatEditorCode(cm),
+            'Shift-Cmd-F': (cm) => formatEditorCode(cm),
+            'Shift-Alt-F': (cm) => formatEditorCode(cm)
         },
-		autoCloseBrackets: true,
-		matchBrackets: true,
-		foldGutter: true,
-		search: true,
-		dialog: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-lint-markers','CodeMirror-foldgutter'],
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        foldGutter: true,
+        search: true,
+        dialog: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-lint-markers', 'CodeMirror-foldgutter'],
         lint: {
             esversion: 11, // Supports async/await, optional chaining (?.), nullish coalescing (??)
             asi: true, // Optional: suppresses missing-semicolon warnings
-			delay: 1000
+            delay: 1000
         }
     };
 
@@ -83,6 +86,37 @@ function initCodeEditors() {
         if (changeObj.origin !== 'setValue')
             isDirty = true;
     });
+}
+
+// beautify
+function formatEditorCode(cm) {
+    console.log("[SNTools] in formatEditorCode");
+    if (cm === jsCm && typeof window.js_beautify !== 'function') return;
+
+    const cursor = cm.getCursor();
+    const scrollInfo = cm.getScrollInfo();
+
+    const formatted = window.js_beautify(cm.getValue(), {
+        indent_size: 4,
+        indent_char: ' ',
+        max_preserve_newlines: 2,
+        preserve_newlines: true,
+        keep_array_indentation: false,
+        break_chained_methods: false,
+        indent_scripts: 'normal',
+        brace_style: 'collapse',
+        space_before_conditional: true,
+        unescape_strings: false,
+        jslint_happy: false,
+        end_with_newline: false,
+        wrap_line_length: 0,
+        indent_empty_lines: false
+    });
+
+    cm.setValue(formatted);
+    cm.setCursor(cursor);
+    cm.scrollTo(scrollInfo.left, scrollInfo.top);
+    cm.focus();
 }
 
 // Track dirty state on standard inputs
@@ -109,7 +143,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Handle "+ New" Button
-newBtn.addEventListener('click', async() => {
+newBtn.addEventListener('click', async () => {
     const canProceed = await handleUnsavedChangesBeforeSwitch();
     if (!canProceed)
         return;
@@ -117,13 +151,13 @@ newBtn.addEventListener('click', async() => {
 });
 
 // Handle "Save" Button
-saveBtn.addEventListener('click', async() => {
+saveBtn.addEventListener('click', async () => {
     await saveCurrentPlugin();
     showStatus('Saved!');
 });
 
 // Handle "Export" (single) Button
-exportSingleBtn.addEventListener('click', async() => {
+exportSingleBtn.addEventListener('click', async () => {
     if (!currentPluginId)
         return;
 
@@ -153,7 +187,7 @@ exportSingleBtn.addEventListener('click', async() => {
     URL.revokeObjectURL(url);
 });
 // Handle "Delete" Button
-deleteBtn.addEventListener('click', async() => {
+deleteBtn.addEventListener('click', async () => {
     if (!currentPluginId)
         return;
 
@@ -199,7 +233,7 @@ importBtn.addEventListener('click', () => {
     importFileInput.click();
 });
 
-importFileInput.addEventListener('change', async(e) => {
+importFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file)
         return;
@@ -214,7 +248,7 @@ importFileInput.addEventListener('change', async(e) => {
         }
 
         const replaceAll = confirm(
-`Found ${imported.length} plugin(s).\n\nClick OK to MERGE with existing plugins, or Cancel to REPLACE all existing plugins.`);
+            `Found ${imported.length} plugin(s).\n\nClick OK to MERGE with existing plugins, or Cancel to REPLACE all existing plugins.`);
 
         if (!replaceAll) {
             plugins = [];
@@ -281,12 +315,12 @@ async function handleUnsavedChangesBeforeSwitch() {
 
 function generateUniqueId(rawName, excludeId = null) {
     let baseSlug = (rawName || 'untitled-plugin')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
 
     if (!baseSlug)
         baseSlug = 'untitled-plugin';
@@ -344,7 +378,7 @@ function renderSidebar() {
       </div>
     `;
 
-        li.addEventListener('click', async() => {
+        li.addEventListener('click', async () => {
             if (plugin.id === currentPluginId)
                 return;
 
@@ -419,17 +453,17 @@ function showStatus(text) {
     statusMsg.classList.add('show');
     setTimeout(() => statusMsg.classList.remove('show'), 1500);
 
-    statusMsgSidebar.textContext = text;
+    statusMsgSidebar.textContent = text;
     statusMsgSidebar.classList.add('show');
-    setTimeout(() => statusMsgSidebar.classList.remove('show'),1500);
+    setTimeout(() => statusMsgSidebar.classList.remove('show'), 1500);
 }
 
 function escapeHtml(str) {
     return str.replace(/[&<>"']/g, m => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        })[m]);
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[m]);
 }
