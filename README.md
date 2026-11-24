@@ -13,6 +13,8 @@ SN Tools is a "plugin management system" of sorts. The Chromium based extension 
 * Inserting an element via a config JSON Object (see below)
 * Hiding an element on the page
 * Access g\_form
+* GET REST calls to retrieve data
+* Standardized console logging (Starts with "[SNTools]" so it's easier to find in the flood of messages)
 * Finding an element via the developer tools console
 * Library plugins that don't directly act, but can be called from other plugins
 * Export all plugins to a JSON file
@@ -137,3 +139,19 @@ This config creates a button that copies the sys\_id of the current record and s
 }
 ```
 
+#### GET REST Calls
+The example below shows getting a single incident back via a REST call.
+```
+SNTools.onRouteChange(async () => {
+    try {
+        const record = SNTools.getRecord();
+        if (!record || record.isWorkspace) return;
+
+        let data = await SNTools.REST("/api/now/table/incident?sysparm_limit=1");
+        SNTools.console(JSON.stringify(data.result, null, 2));
+
+    } catch (e) {
+        SNTools.console(e.message, 'error');
+    }
+});
+```
