@@ -80,6 +80,15 @@
             if (node.shadowRoot) {
                 deepQuerySelectorAll(selector, node.shadowRoot, results);
             }
+            if (node.tagName === 'IFRAME') {
+                try {
+                    if (node.contentDocument) {
+                        deepQuerySelectorAll(selector, node.contentDocument, results);
+                    }
+                } catch (e) {
+                    // Ignore cross-origin iframes
+                }
+            }
             node = walker.nextNode();
         }
         return results;
@@ -111,8 +120,8 @@
         // Decode URL so encoded Next Experience classic URLs (%3Fsys_id%3D...) parse cleanly
         const decodedUrl = decodeURIComponent(location.href);
 
-        // 1. Workspace URLs: .../record/incident/a1b2c3d4...
-        const workspaceMatch = decodedUrl.match(/\/record\/([a-z0-9_]+)\/([a-f0-9]{32})/i);
+        // 1. Workspace URLs (matches active primary tab or active /sub/record/ tab)
+        const workspaceMatch = decodedUrl.match(/.*\/record\/([a-z0-9_]+)\/([a-f0-9]{32})/i);
         if (workspaceMatch) {
             return {
                 table: workspaceMatch[1],
@@ -231,11 +240,14 @@
 
         const doc = target.ownerDocument;
 
-        // Prevent duplicates if an id is provided
+        // Prevent duplicates if an id is provided (scoped to current Document or ShadowRoot)
         if (config.id) {
-            const existing = doc.getElementById(config.id);
-            if (existing)
-                return existing;
+            const root = target.getRootNode();
+            if (typeof root.getElementById === 'function') {
+                const existing = root.getElementById(config.id);
+                if (existing)
+                    return existing;
+            }
         }
 
         // Determine HTML tag (defaults to 'button' if type is 'button', otherwise 'div')
@@ -288,19 +300,19 @@
         }
 
         switch (position) {
-        case 'insideBefore':
-            target.prepend(el);
-            break;
-        case 'before':
-            target.before(el);
-            break;
-        case 'after':
-            target.after(el);
-            break;
-        case 'insideAfter':
-        default:
-            target.appendChild(el);
-            break;
+            case 'insideBefore':
+                target.prepend(el);
+                break;
+            case 'before':
+                target.before(el);
+                break;
+            case 'after':
+                target.after(el);
+                break;
+            case 'insideAfter':
+            default:
+                target.appendChild(el);
+                break;
         }
 
         return el;
@@ -442,7 +454,7 @@
     }
 
     async function restAPI(url, options = {}) {
-        if (options.method && options.method.toUpperCase()!='GET'){
+        if (options.method && options.method.toUpperCase() != 'GET') {
             throw new Error(`[SNTools] Read-only restriction: HTTP method "${options.method}" is not permitted. Only GET requests are allowed.`);
         }
         const token = await getUserToken();
@@ -499,18 +511,18 @@
         return data;
     }
 
-    function consoleSNTools(message, level){
+    function consoleSNTools(message, level) {
         if (!message) return;
-        switch (level){
+        switch (level) {
             case "info":
-                console.info("[SNTools "+message);
+                console.info("[SNTools " + message);
                 break;
             case "error":
-                console.error("[SNTools] "+message);
+                console.error("[SNTools] " + message);
                 break;
             case "log":
             default:
-                console.log("[SNTools] "+message);
+                console.log("[SNTools] " + message);
         };
     }
 

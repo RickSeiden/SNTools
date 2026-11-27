@@ -43,13 +43,13 @@ function initCodeEditors() {
     const commonConfig = {
         theme: 'dracula',
         lineNumbers: true,
-        tabSize: 2,
+        tabSize: 4,
         indentWithTabs: false,
         lineWrapping: true,
         extraKeys: {
             'Ctrl-S': () => saveBtn.click(),
             'Cmd-S': () => saveBtn.click(),
-            'Shift-Ctrl-F': (cm) => formatEditorCode(cm),
+            'Shift-Ctrl-F': (cm) => formatCSSCode(cm),
             'Shift-Cmd-F': (cm) => formatEditorCode(cm),
             'Shift-Alt-F': (cm) => formatEditorCode(cm)
         },
@@ -90,7 +90,6 @@ function initCodeEditors() {
 
 // beautify
 function formatEditorCode(cm) {
-    console.log("[SNTools] in formatEditorCode");
     if (cm === jsCm && typeof window.js_beautify !== 'function') return;
 
     const cursor = cm.getCursor();
@@ -111,6 +110,27 @@ function formatEditorCode(cm) {
         end_with_newline: false,
         wrap_line_length: 0,
         indent_empty_lines: false
+    });
+
+    cm.setValue(formatted);
+    cm.setCursor(cursor);
+    cm.scrollTo(scrollInfo.left, scrollInfo.top);
+    cm.focus();
+}
+
+function formatCSSCode(cm) {
+    if (cm === cssCm && typeof window.css_beautify !== 'function') return;
+
+    const cursor = cm.getCursor();
+    const scrollInfo = cm.getScrollInfo();
+
+    const formatted = window.css_beautify(cm.getValue(), {
+        indent_size: 4,
+        indent_char: ' ',
+        selector_separator_newline: true,
+        end_with_newline: false,
+        newline_between_rules: true,
+         space_around_selector_separator: false
     });
 
     cm.setValue(formatted);
