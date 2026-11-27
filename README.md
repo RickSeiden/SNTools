@@ -1,10 +1,12 @@
-# SN Tools
+# SNPlugins
 
 
 
-SN Tools is a "plugin management system" of sorts. The Chromium based extension allows you to create JavaScript code segments that run inside of ServiceNow without making any changes to the instance.
+SNPlugins is a "plugin management system" of sorts. The Chromium based extension allows you to create JavaScript code segments that run inside of ServiceNow without making any changes to the instance.
 
+SNPlugins is *not* a replacement for [SNUtils](https://snutils.com/). SNPlugins is *not* meant to "compete" with SNUtils.  I use SNUtils every day at work, and believe it is an incredible tool.  Anything that is done in SNPlugins could be incorporated into SNUtils, and very well may be in the future.
 
+SNPlugins is meant to give you the opportunity to write code snippets that do things other tools, like SNUtils, don't currently do.
 
 ##### Current Features
 
