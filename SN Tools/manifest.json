@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "SNTools",
+  "name": "SNPlugins",
   "version": "1.0",
   "permissions": [
     "storage",
@@ -28,7 +28,7 @@
     }
   ],
   "icons": {
-	  "128": "SNTools-128.png",
-	  "48": "SNTools-48.png"
+	  "128": "SNPlugins-128.png",
+	  "48": "SNPlugins-48.png"
   }
 }

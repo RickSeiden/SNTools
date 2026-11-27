@@ -1,4 +1,4 @@
-SNTools includes the following third-party open-source software:
+SNPlugins includes the following third-party open-source software:
 
 ================================================================================
 CodeMirror (https://codemirror.net/)

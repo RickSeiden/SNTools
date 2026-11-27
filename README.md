@@ -14,7 +14,7 @@ SN Tools is a "plugin management system" of sorts. The Chromium based extension 
 * Hiding an element on the page
 * Access g\_form
 * GET REST calls to retrieve data
-* Standardized console logging (Starts with "[SNTools]" so it's easier to find in the flood of messages)
+* Standardized console logging (Starts with "[SNPlugins]" so it's easier to find in the flood of messages)
 * Finding an element via the developer tools console
 * Library plugins that don't directly act, but can be called from other plugins
 * Export all plugins to a JSON file
@@ -26,7 +26,7 @@ SN Tools is a "plugin management system" of sorts. The Chromium based extension 
 
 ##### Finding an element
 
-Because ServiceNow uses shadow roots and iframes, it can be difficult to find the element you want to work with.  To help with this, the SNTools API has a getWaitFor function. To use it, open the developer tools in your browser, and press Control-Shift-C (sorry, Mac, I don't know) then select your element on the ServiceNow page.
+Because ServiceNow uses shadow roots and iframes, it can be difficult to find the element you want to work with.  To help with this, the SNPlugins API has a getWaitFor function. To use it, open the developer tools in your browser, and press Control-Shift-C (sorry, Mac, I don't know) then select your element on the ServiceNow page.
 
 
 
@@ -34,11 +34,11 @@ Once selected, in your browser, enter:
 
 
 
-top.SNTools.getWaitFor($0)
+top.SNPlugins.getWaitFor($0)
 
 
 
-SNTools will give you a text string that you can use to hide or otherwise work with that element.
+SNPlugins will give you a text string that you can use to hide or otherwise work with that element.
 
 
 
@@ -47,8 +47,8 @@ SNTools will give you a text string that you can use to hide or otherwise work w
 The most basic plugin is given to you when you click the New button to start a new plugin
 
 ```
-SNTools.onRouteChange(async () => {
-  const record = SNTools.getRecord();
+SNPlugins.onRouteChange(async () => {
+  const record = SNPlugins.getRecord();
   if (!record || record.isWorkspace) return;
 });
 ```
@@ -58,7 +58,7 @@ Your code goes after the if statement.
 
 ##### Adding an element
 
-To add an element to the form, use one of the SNTools.add functions
+To add an element to the form, use one of the SNPlugins.add functions
 
 
 
@@ -74,7 +74,7 @@ To add an element to the form, use one of the SNTools.add functions
 All of them take two parameters
 
 * selector
-  * The text string retrieved from SNTools.getWaitFor()
+  * The text string retrieved from SNPlugins.getWaitFor()
 * config
   * A JSON object describing the element to add
 
@@ -142,16 +142,16 @@ This config creates a button that copies the sys\_id of the current record and s
 #### GET REST Calls
 The example below shows getting a single incident back via a REST call.
 ```
-SNTools.onRouteChange(async () => {
+SNPlugins.onRouteChange(async () => {
     try {
-        const record = SNTools.getRecord();
+        const record = SNPlugins.getRecord();
         if (!record || record.isWorkspace) return;
 
-        let data = await SNTools.REST("/api/now/table/incident?sysparm_limit=1");
-        SNTools.console(JSON.stringify(data.result, null, 2));
+        let data = await SNPlugins.REST("/api/now/table/incident?sysparm_limit=1");
+        SNPlugins.console(JSON.stringify(data.result, null, 2));
 
     } catch (e) {
-        SNTools.console(e.message, 'error');
+        SNPlugins.console(e.message, 'error');
     }
 });
 ```

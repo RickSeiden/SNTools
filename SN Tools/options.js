@@ -369,7 +369,7 @@ function createNewPluginDraft() {
         active: true,
         library: false,
         matchPattern: 'service-now.com',
-        code: 'SNTools.onRouteChange(async () => {\n  const record = SNTools.getRecord();\n  if (!record || record.isWorkspace) return;\n\n});',
+        code: 'SNPlugins.onRouteChange(async () => {\n  const record = SNPlugins.getRecord();\n  if (!record || record.isWorkspace) return;\n\n});',
         css: ''
     };
 

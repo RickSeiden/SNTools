@@ -87,7 +87,7 @@ chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
         });
     }
 
-    // 2. Inject matching plugins now that window.SNTools is ready
+    // 2. Inject matching plugins now that window.SNPlugins is ready
     for (const plugin of matchingPlugins) {
         // Still inject into top-level document (for Classic UI16 or document.body overlays)
         if (plugin.css) {
@@ -111,7 +111,7 @@ chrome.tabs.onUpdated.addListener(async(tabId, changeInfo, tab) => {
                         const fn = new Function('PLUGIN_CSS', 'PLUGIN_ID', codeString);
                         fn(cssString || '', pluginId);
                     } catch (err) {
-                        console.error(`[SNTools] Plugin Error: ${pluginName}`, err);
+                        console.error(`[SNPlugins] Plugin Error: ${pluginName}`, err);
                     }
                 },
                 args: [plugin.code, plugin.css, plugin.id, plugin.name]

@@ -1,6 +1,6 @@
 (() => {
     // Prevent double-initialization if background.js fires twice
-    if (window.SNTools)
+    if (window.SNPlugins)
         return;
 
     const routeListeners = new Set();
@@ -18,7 +18,7 @@
                 try {
                     cb(location.href);
                 } catch (err) {
-                    console.error('[SNTools] Route listener error:', err);
+                    console.error('[SNPlugins] Route listener error:', err);
                 }
             });
         }, 300);
@@ -109,7 +109,7 @@
                     resolve(el);
                 } else if (Date.now() - startTime >= timeoutMs) {
                     clearInterval(interval);
-                    reject(new Error(`[SNTools] Timed out waiting for: ${selector}`));
+                    reject(new Error(`[SNPlugins] Timed out waiting for: ${selector}`));
                 }
             }, 250);
         });
@@ -157,7 +157,7 @@
 
     function getWaitForText(el) {
         if (!el || el.nodeType !== 1) {
-            console.warn('[SNTools] Please pass a valid DOM element (tip: inspect an element and pass $0).');
+            console.warn('[SNPlugins] Please pass a valid DOM element (tip: inspect an element and pass $0).');
             return null;
         }
 
@@ -212,8 +212,8 @@
 
             // Verify uniqueness both locally and across Shadow DOMs/iframes
             if (root.querySelectorAll(candidate).length === 1 && deepQuerySelector(candidate) === el) {
-                const snippet = `await SNTools.waitFor('${candidate.replace(/'/g, "\\'")}')`;
-                console.log(`%c[SNTools] Selector found:\n%c${snippet}`, 'color: #10b981; font-weight: bold;', 'color: #60a5fa;');
+                const snippet = `await SNPlugins.waitFor('${candidate.replace(/'/g, "\\'")}')`;
+                console.log(`%c[SNPlugins] Selector found:\n%c${snippet}`, 'color: #10b981; font-weight: bold;', 'color: #60a5fa;');
                 return candidate;
             }
 
@@ -225,8 +225,8 @@
         }
 
         const finalSelector = parts.join(' > ');
-        const snippet = `await SNTools.waitFor('${finalSelector.replace(/'/g, "\\'")}')`;
-        console.log(`%c[SNTools] Selector found:\n%c${snippet}`, 'color: #10b981; font-weight: bold;', 'color: #60a5fa;');
+        const snippet = `await SNPlugins.waitFor('${finalSelector.replace(/'/g, "\\'")}')`;
+        console.log(`%c[SNPlugins] Selector found:\n%c${snippet}`, 'color: #10b981; font-weight: bold;', 'color: #60a5fa;');
 
         return finalSelector;
     }
@@ -234,7 +234,7 @@
     async function insertElement(selector, config = {}, position = 'insideAfter') {
         const target = await waitForElement(selector, config.timeout || 10000).catch(() => null);
         if (!target) {
-            console.warn(`[SNTools] Target not found for selector: ${selector}`);
+            console.warn(`[SNPlugins] Target not found for selector: ${selector}`);
             return null;
         }
 
@@ -337,7 +337,7 @@
 
             const checkReady = () => {
                 if (Date.now() - startTime > timeout) {
-                    return reject(new Error('[SNTools] Timed out waiting for page to finish loading.'));
+                    return reject(new Error('[SNPlugins] Timed out waiting for page to finish loading.'));
                 }
 
                 // 1. Top-level document must be complete
@@ -383,13 +383,13 @@
         try {
             const target = await waitForElement(selector, timeout || 10000).catch(() => null);
             if (!target) {
-                console.warn(`[SNTools] Target not found for selector: ${selector}`);
+                console.warn(`[SNPlugins] Target not found for selector: ${selector}`);
                 return null;
             }
 
             target.style.display = "none";
         } catch (e) {
-            console.log("[SNTools] hideElement error: " + e.message);
+            console.log("[SNPlugins] hideElement error: " + e.message);
         }
     }
 
@@ -447,7 +447,7 @@
                 return cachedUserToken;
             }
         } catch (err) {
-            console.warn('[SNTools] Failed to retrieve g_ck fallback token:', err);
+            console.warn('[SNPlugins] Failed to retrieve g_ck fallback token:', err);
         }
 
         return null;
@@ -455,11 +455,11 @@
 
     async function restAPI(url, options = {}) {
         if (options.method && options.method.toUpperCase() != 'GET') {
-            throw new Error(`[SNTools] Read-only restriction: HTTP method "${options.method}" is not permitted. Only GET requests are allowed.`);
+            throw new Error(`[SNPlugins] Read-only restriction: HTTP method "${options.method}" is not permitted. Only GET requests are allowed.`);
         }
         const token = await getUserToken();
         if (!token) {
-            throw new Error('[SNTools] Unable to locate ServiceNow session token (g_ck).');
+            throw new Error('[SNPlugins] Unable to locate ServiceNow session token (g_ck).');
         }
 
         // Normalize relative paths (e.g. "/api/now/table/incident?...") to current instance origin
@@ -502,7 +502,7 @@
 
         if (!response.ok) {
             const detail = data?.error?.message || response.statusText;
-            const err = new Error(`[SNTools] REST ${method} failed (${response.status}): ${detail}`);
+            const err = new Error(`[SNPlugins] REST ${method} failed (${response.status}): ${detail}`);
             err.status = response.status;
             err.response = data;
             throw err;
@@ -511,22 +511,22 @@
         return data;
     }
 
-    function consoleSNTools(message, level) {
+    function consoleSNPlugins(message, level) {
         if (!message) return;
         switch (level) {
             case "info":
-                console.info("[SNTools " + message);
+                console.info("[SNPlugins " + message);
                 break;
             case "error":
-                console.error("[SNTools] " + message);
+                console.error("[SNPlugins] " + message);
                 break;
             case "log":
             default:
-                console.log("[SNTools] " + message);
+                console.log("[SNPlugins] " + message);
         };
     }
 
-    window.SNTools = {
+    window.SNPlugins = {
         query: deepQuerySelector,
         queryAll: deepQuerySelectorAll,
         waitFor: waitForElement,
@@ -549,8 +549,8 @@
         hideElement: hideElementAPI,
         getToken: getUserToken,
         REST: restAPI,
-        console: consoleSNTools
+        console: consoleSNPlugins
     };
 
-    console.log('[SNTools] ServiceNow Helper SDK initialized.');
+    console.log('[SNPlugins] ServiceNow Helper SDK initialized.');
 })();

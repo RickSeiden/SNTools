@@ -1,10 +1,10 @@
-# SNTools
+# SNPlugins
 
-The `SNTools` API is the central structure used to build ServiceNow plugins across Classic UI16 and Next Experience (Workspace).
+The `SNPlugins` API is the central structure used to build ServiceNow plugins across Classic UI16 and Next Experience (Workspace).
 
 ---
 
-## SNTools.query(selector, [root])
+## SNPlugins.query(selector, [root])
 
 Searches for the first element matching a CSS selector, traversing Shadow DOM boundaries and same-origin `<iframe>` elements (such as `iframe#gsft_main`).
 
@@ -21,13 +21,13 @@ Searches for the first element matching a CSS selector, traversing Shadow DOM bo
 
 ### Example
 ```javascript
-const saveBtn = SNTools.query('button[data-action="save"]');
+const saveBtn = SNPlugins.query('button[data-action="save"]');
 ```
 This immediately searches the current document, Shadow DOMs, and accessible iframes for the matching button without waiting.
 
 ---
 
-## SNTools.queryAll(selector, [root], [results])
+## SNPlugins.queryAll(selector, [root], [results])
 
 Searches for all elements matching a CSS selector across the DOM, Shadow DOMs, and same-origin `<iframe>` elements.
 
@@ -45,13 +45,13 @@ Searches for all elements matching a CSS selector across the DOM, Shadow DOMs, a
 
 ### Example
 ```javascript
-const labels = SNTools.queryAll('span.sn-chrome-one-tab-label');
+const labels = SNPlugins.queryAll('span.sn-chrome-one-tab-label');
 ```
 This collects all matching tab label spans across Workspace Shadow DOMs and frames.
 
 ---
 
-## await SNTools.waitFor(selector, [timeoutMs])
+## await SNPlugins.waitFor(selector, [timeoutMs])
 
 Asynchronous function that polls for an element matching `selector` (across Shadow DOMs and same-origin iframes) until it appears or the timeout expires.
 
@@ -66,19 +66,19 @@ Asynchronous function that polls for an element matching `selector` (across Shad
 | :--- | :--- |
 | Promise\<Element\> | Resolves to the matching DOM `Element` once found. |
 
-If the element is not found within `timeoutMs`, `SNTools.waitFor` rejects with an `Error` (`[SNTools] Timed out waiting for: <selector>`).
+If the element is not found within `timeoutMs`, `SNPlugins.waitFor` rejects with an `Error` (`[SNPlugins] Timed out waiting for: <selector>`).
 
 ### Example
 ```javascript
-SNTools.onRouteChange(async () => {
+SNPlugins.onRouteChange(async () => {
     try {
-        const record = SNTools.getRecord();
+        const record = SNPlugins.getRecord();
         if (!record || record.isWorkspace) return;
 
-        const numberLabel = await SNTools.waitFor(`#label\\.${record.table}\\.number`);
-        SNTools.console('Found label: ' + numberLabel.textContent);
+        const numberLabel = await SNPlugins.waitFor(`#label\\.${record.table}\\.number`);
+        SNPlugins.console('Found label: ' + numberLabel.textContent);
     } catch (e) {
-        SNTools.console(e.message, 'error');
+        SNPlugins.console(e.message, 'error');
     }
 });
 ```
@@ -86,7 +86,7 @@ This waits for the Number field label on a classic form to render and logs its t
 
 ---
 
-## SNTools.getRecord()
+## SNPlugins.getRecord()
 
 Extracts the current record context (`table`, `sysId`, and `isWorkspace`) from `location.href`, supporting both Workspace `/record/` routes and Classic UI16 `.do` URLs (including percent-encoded URLs).
 
@@ -100,16 +100,16 @@ This method takes no parameters.
 
 ### Example
 ```javascript
-const record = SNTools.getRecord();
+const record = SNPlugins.getRecord();
 if (record?.table === 'incident') {
-    SNTools.console(`Viewing incident ${record.sysId}`);
+    SNPlugins.console(`Viewing incident ${record.sysId}`);
 }
 ```
 This checks whether the user is currently on an `incident` record.
 
 ---
 
-## SNTools.injectShadowCSS(hostOrShadowRoot, cssText, [styleId])
+## SNPlugins.injectShadowCSS(hostOrShadowRoot, cssText, [styleId])
 
 Injects a `<style>` element into a host element's `shadowRoot` (or directly into a `ShadowRoot` / root node) if a style element with `styleId` is not already present there.
 
@@ -127,16 +127,16 @@ Injects a `<style>` element into a host element's `shadowRoot` (or directly into
 
 ### Example
 ```javascript
-const host = await SNTools.waitFor('sn-canvas-component');
-SNTools.injectShadowCSS(host, '.custom-badge { color: green; }', 'my-badge-css');
+const host = await SNPlugins.waitFor('sn-canvas-component');
+SNPlugins.injectShadowCSS(host, '.custom-badge { color: green; }', 'my-badge-css');
 ```
 This injects custom CSS into the target component's Shadow DOM once.
 
 ---
 
-## SNTools.getWaitFor(el)
+## SNPlugins.getWaitFor(el)
 
-Inspects a DOM `Element` (such as `$0` in DevTools) and builds a candidate CSS selector string, logging a ready-to-use `SNTools.waitFor(...)` snippet to the console.
+Inspects a DOM `Element` (such as `$0` in DevTools) and builds a candidate CSS selector string, logging a ready-to-use `SNPlugins.waitFor(...)` snippet to the console.
 
 ### Parameters
 | Name | Type | Description |
@@ -150,13 +150,13 @@ Inspects a DOM `Element` (such as `$0` in DevTools) and builds a candidate CSS s
 
 ### Example
 ```javascript
-const selector = SNTools.getWaitFor($0);
+const selector = SNPlugins.getWaitFor($0);
 ```
 This generates and logs a selector for the currently inspected element in browser DevTools.
 
 ---
 
-## await SNTools.insertElement(selector, [config], [position])
+## await SNPlugins.insertElement(selector, [config], [position])
 
 Waits for `selector` to appear, creates a new DOM element according to `config`, and inserts it relative to the target element using `position` (`'insideAfter'`, `'insideBefore'`, `'before'`, or `'after'`).
 
@@ -189,26 +189,26 @@ Waits for `selector` to appear, creates a new DOM element according to `config`,
 
 ### Example
 ```javascript
-await SNTools.insertElement('#action-bar', {
+await SNPlugins.insertElement('#action-bar', {
     id: 'sn-tools-ping-btn',
     type: 'button',
     text: 'Ping',
-    onclick: () => SNTools.console('Pong!')
+    onclick: () => SNPlugins.console('Pong!')
 }, 'insideAfter');
 ```
 This waits for `#action-bar` and appends a `Ping` button inside the end of it.
 
 ---
 
-## await SNTools.addInsideAfter(selector, [config])
+## await SNPlugins.addInsideAfter(selector, [config])
 
-Convenience wrapper around `SNTools.insertElement(selector, config, 'insideAfter')` that appends a new element as the last child inside the target element.
+Convenience wrapper around `SNPlugins.insertElement(selector, config, 'insideAfter')` that appends a new element as the last child inside the target element.
 
 ### Parameters
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | `selector` | String | CSS selector for the target container element. |
-| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNTools.insertElement`). |
+| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNPlugins.insertElement`). |
 
 ### Config Object Properties
 * `tag` (`String`): HTML tag name to create (defaults to `'button'` when `config.type === 'button'`, otherwise `'div'`).
@@ -232,7 +232,7 @@ Convenience wrapper around `SNTools.insertElement(selector, config, 'insideAfter
 
 ### Example
 ```javascript
-await SNTools.addInsideAfter('#label\\.incident\\.number', {
+await SNPlugins.addInsideAfter('#label\\.incident\\.number', {
     tag: 'span',
     text: ' *',
     style: { color: 'red' }
@@ -242,15 +242,15 @@ This appends a red asterisk span inside the end of the Incident Number label.
 
 ---
 
-## await SNTools.addInsideBefore(selector, [config])
+## await SNPlugins.addInsideBefore(selector, [config])
 
-Convenience wrapper around `SNTools.insertElement(selector, config, 'insideBefore')` that prepends a new element as the first child inside the target element.
+Convenience wrapper around `SNPlugins.insertElement(selector, config, 'insideBefore')` that prepends a new element as the first child inside the target element.
 
 ### Parameters
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | `selector` | String | CSS selector for the target container element. |
-| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNTools.insertElement`). |
+| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNPlugins.insertElement`). |
 
 ### Config Object Properties
 * `tag` (`String`): HTML tag name to create (defaults to `'button'` when `config.type === 'button'`, otherwise `'div'`).
@@ -274,7 +274,7 @@ Convenience wrapper around `SNTools.insertElement(selector, config, 'insideBefor
 
 ### Example
 ```javascript
-await SNTools.addInsideBefore('.toolbar', {
+await SNPlugins.addInsideBefore('.toolbar', {
     id: 'sn-tools-prefix',
     text: '[Tools]'
 });
@@ -283,15 +283,15 @@ This prepends a `[Tools]` element at the start of `.toolbar`.
 
 ---
 
-## await SNTools.addBefore(selector, [config])
+## await SNPlugins.addBefore(selector, [config])
 
-Convenience wrapper around `SNTools.insertElement(selector, config, 'before')` that inserts a new sibling element immediately before the target element.
+Convenience wrapper around `SNPlugins.insertElement(selector, config, 'before')` that inserts a new sibling element immediately before the target element.
 
 ### Parameters
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | `selector` | String | CSS selector for the target sibling element. |
-| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNTools.insertElement`). |
+| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNPlugins.insertElement`). |
 
 ### Config Object Properties
 * `tag` (`String`): HTML tag name to create (defaults to `'button'` when `config.type === 'button'`, otherwise `'div'`).
@@ -315,25 +315,25 @@ Convenience wrapper around `SNTools.insertElement(selector, config, 'before')` t
 
 ### Example
 ```javascript
-await SNTools.addBefore('#submit_btn', {
+await SNPlugins.addBefore('#submit_btn', {
     type: 'button',
     text: 'Preview',
-    onclick: () => SNTools.console('Preview clicked')
+    onclick: () => SNPlugins.console('Preview clicked')
 });
 ```
 This places a `Preview` button immediately before `#submit_btn`.
 
 ---
 
-## await SNTools.addAfter(selector, [config])
+## await SNPlugins.addAfter(selector, [config])
 
-Convenience wrapper around `SNTools.insertElement(selector, config, 'after')` that inserts a new sibling element immediately after the target element.
+Convenience wrapper around `SNPlugins.insertElement(selector, config, 'after')` that inserts a new sibling element immediately after the target element.
 
 ### Parameters
 | Name | Type | Description |
 | :--- | :--- | :--- |
 | `selector` | String | CSS selector for the target sibling element. |
-| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNTools.insertElement`). |
+| `config` | Object | Optional configuration object describing the new element (see **Config Object Properties** under `SNPlugins.insertElement`). |
 
 ### Config Object Properties
 * `tag` (`String`): HTML tag name to create (defaults to `'button'` when `config.type === 'button'`, otherwise `'div'`).
@@ -357,7 +357,7 @@ Convenience wrapper around `SNTools.insertElement(selector, config, 'after')` th
 
 ### Example
 ```javascript
-await SNTools.addAfter('#incident\\.short_description', {
+await SNPlugins.addAfter('#incident\\.short_description', {
     tag: 'div',
     text: 'Keep concise (< 160 chars)',
     className: 'help-hint'
@@ -367,7 +367,7 @@ This inserts a helper element immediately after `#incident.short_description`.
 
 ---
 
-## SNTools.onRouteChange(callback, [runImmediately])
+## SNPlugins.onRouteChange(callback, [runImmediately])
 
 Registers a listener function to be invoked when SPA navigation occurs (`history.pushState`, `history.replaceState`, or `popstate`), with a 300ms delay after URL changes.
 
@@ -384,15 +384,15 @@ Registers a listener function to be invoked when SPA navigation occurs (`history
 
 ### Example
 ```javascript
-const unsubscribe = SNTools.onRouteChange((url) => {
-    SNTools.console('Navigated to: ' + url);
+const unsubscribe = SNPlugins.onRouteChange((url) => {
+    SNPlugins.console('Navigated to: ' + url);
 });
 ```
 This runs the callback right away and again whenever the URL changes in the SPA.
 
 ---
 
-## SNTools.g_form()
+## SNPlugins.g_form()
 
 Retrieves ServiceNow's `g_form` client API object from the current window or from `iframe#gsft_main` (including across Shadow DOMs).
 
@@ -406,16 +406,16 @@ This method takes no parameters.
 
 ### Example
 ```javascript
-const gForm = SNTools.g_form();
+const gForm = SNPlugins.g_form();
 if (gForm) {
-    SNTools.console('Current number: ' + gForm.getValue('number'));
+    SNPlugins.console('Current number: ' + gForm.getValue('number'));
 }
 ```
 This reads the `number` field value via `g_form` when available.
 
 ---
 
-## await SNTools.waitForLoaded([timeout])
+## await SNPlugins.waitForLoaded([timeout])
 
 Asynchronous helper that waits until `document.readyState === 'complete'` and, if present, `iframe#gsft_main` is also loaded (and not `about:blank`), or until `document.body` has children on non-framed pages.
 
@@ -429,18 +429,18 @@ Asynchronous helper that waits until `document.readyState === 'complete'` and, i
 | :--- | :--- |
 | Promise\<{ window: Window, document: Document }\> | Resolves with the active `window` and `document` (the `gsft_main` frame's window/document when present). |
 
-If loading does not complete within `timeout`, it rejects with an `Error` (`[SNTools] Timed out waiting for page to finish loading.`).
+If loading does not complete within `timeout`, it rejects with an `Error` (`[SNPlugins] Timed out waiting for page to finish loading.`).
 
 ### Example
 ```javascript
-const { document: targetDoc } = await SNTools.waitForLoaded();
-SNTools.console('Ready in: ' + targetDoc.title);
+const { document: targetDoc } = await SNPlugins.waitForLoaded();
+SNPlugins.console('Ready in: ' + targetDoc.title);
 ```
 This waits for the page and `gsft_main` (if present) to finish loading before reading `targetDoc.title`.
 
 ---
 
-## await SNTools.hideElement(selector, [timeout])
+## await SNPlugins.hideElement(selector, [timeout])
 
 Waits for the element matching `selector` and sets `target.style.display = "none"`.
 
@@ -457,13 +457,13 @@ Waits for the element matching `selector` and sets `target.style.display = "none
 
 ### Example
 ```javascript
-await SNTools.hideElement('.promo-banner');
+await SNPlugins.hideElement('.promo-banner');
 ```
 This waits for `.promo-banner` and hides it from view.
 
 ---
 
-## await SNTools.getToken()
+## await SNPlugins.getToken()
 
 Retrieves and caches the ServiceNow session token (`g_ck`) from `window.g_ck`, `window.NOW.g_ck`, `iframe#gsft_main`, previously cached state, inline `<script>` tags, or a fallback fetch to `/nav_to.do`.
 
@@ -477,13 +477,13 @@ This method takes no parameters.
 
 ### Example
 ```javascript
-const token = await SNTools.getToken();
+const token = await SNPlugins.getToken();
 ```
 This resolves the session token needed for authenticated ServiceNow requests.
 
 ---
 
-## await SNTools.REST(url, [options])
+## await SNPlugins.REST(url, [options])
 
 Performs an authenticated ServiceNow REST API request using `fetch` with `X-UserToken` and `credentials: 'same-origin'`.
 
@@ -502,16 +502,16 @@ Throws an `Error` if a non-`GET` method is passed, if `g_ck` cannot be retrieved
 
 ### Example
 ```javascript
-const data = await SNTools.REST('/api/now/table/incident?sysparm_limit=5');
-SNTools.console('Count: ' + (data.result?.length || 0));
+const data = await SNPlugins.REST('/api/now/table/incident?sysparm_limit=5');
+SNPlugins.console('Count: ' + (data.result?.length || 0));
 ```
 This queries up to five incident records via the Table API.
 
 ---
 
-## SNTools.console(message, [level])
+## SNPlugins.console(message, [level])
 
-Logs a prefixed `[SNTools]` message to the browser console using `console.log`, `console.info`, or `console.error`.
+Logs a prefixed `[SNPlugins]` message to the browser console using `console.log`, `console.info`, or `console.error`.
 
 ### Parameters
 | Name | Type | Description |
@@ -526,6 +526,6 @@ Logs a prefixed `[SNTools]` message to the browser console using `console.log`, 
 
 ### Example
 ```javascript
-SNTools.console('Plugin initialized', 'info');
+SNPlugins.console('Plugin initialized', 'info');
 ```
-This writes an informational `[SNTools]` message to the console.
+This writes an informational `[SNPlugins]` message to the console.
