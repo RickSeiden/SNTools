@@ -1,44 +1,8 @@
-// function matchesUrl(url, rawPattern) {
-// if (!rawPattern || !rawPattern.trim()) return false;
-
-// // 1. Check if the entire pattern is wrapped in /regex/flags (e.g. /incident|problem/i)
-// const regexLiteral = rawPattern.trim().match(/^\/(.+)\/([gimsuy]*)$/);
-// if (regexLiteral) {
-// try {
-// return new RegExp(regexLiteral[1], regexLiteral[2]).test(url);
-// } catch (err) {
-// console.warn('[Plugin Container] Invalid regex pattern:', rawPattern, err);
-// return false;
-// }
-// }
-
-
-// // 2. Otherwise, split by commas to allow multiple patterns (supports * wildcards)
-// const patterns = rawPattern
-// .split(',')
-// .map((p) => p.trim())
-// .filter(Boolean);
-
-// return patterns.some((pattern) => {
-// const itemRegex = pattern.match(/^\/(.+)\/([gimsuy]*)$/);
-// if (itemRegex) {
-// try {
-// return new RegExp(itemRegex[1], itemRegex[2]).test(url);
-// } catch {
-// return false;
-// }
-// }
-
-// if (pattern.includes('*')) {
-// const escaped = pattern
-// .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-// .replace(/\*/g, '.*');
-// return new RegExp(escaped, 'i').test(url);
-// }
-
-// return url.toLowerCase().includes(pattern.toLowerCase());
-// });
-// }
+chrome.action.onClicked.addListener(() => {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL("options.html")
+  });
+});
 
 function matchesUrl(url, matchString) {
   if (!matchString || !matchString.trim()) return true;

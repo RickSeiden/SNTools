@@ -22,8 +22,19 @@ const statusMsgSidebar = document.getElementById('statusMsgSidebar');
 const exportBtn = document.getElementById('exportBtn');
 const importBtn = document.getElementById('importBtn');
 const importFileInput = document.getElementById('importFileInput');
+const extensionActiveCheckbox = document.getElementById('extensionActive');
+
 
 // Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+  const { extensionActive = true } = await chrome.storage.local.get('extensionActive');
+  extensionActiveCheckbox.checked = extensionActive;
+});
+
+extensionActiveCheckbox.addEventListener('change', async () => {
+  await chrome.storage.local.set({ extensionActive: extensionActiveCheckbox.checked });
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     initCodeEditors();
 
